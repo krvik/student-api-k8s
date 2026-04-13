@@ -1,0 +1,63 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: student-api-config
+  namespace: student-api
+
+data:
+  DB_HOST: postgres
+  DB_PORT: "5432"
+  DB_NAME: studentdb
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: student-api
+  namespace: student-api
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: student-api
+
+  template:
+      metadata:
+        labels:
+          app: student-api
+
+      spec:
+       initContainers:
+         - name: db-migrations
+           image: vikashkumardev1996/rest_api_webserver:latest
+           command: ["sh", "-c", "npm run migrate"]
+           envFrom:
+             - configMapRef:
+                name: student-api-config
+       containers:
+        - name: app
+          image: vikashkumardev1996/rest_api_webserver:latest
+          envFrom:
+            - configMapRef:
+               name: student-api-config
+          ports:
+            - containerPort: 8080 
+---
+ # service
+ 
+apiVersion: v1
+kind: Service
+metadata:
+  name: student-api-service
+  namespace: student-api
+spec:
+  type: ClusterIP
+  selector:
+    app: student-api
+
+  ports:
+    - port: 80
+      targetPort: 8080
+
