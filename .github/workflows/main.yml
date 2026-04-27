@@ -25,4 +25,4 @@ jobs:
 
       - name: Executer K8s manifest file
         run: |
-         kubectl apply -f .              # location of k8s folder
+         kubectl apply -f k8s/             # location of k8s folder
