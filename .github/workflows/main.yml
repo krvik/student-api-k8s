@@ -12,7 +12,7 @@ jobs:
   k8s-deploy:
     name: Deployment on K8s
     runs-on: self-hosted
-    needs: deploy
+
 
     if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
 
