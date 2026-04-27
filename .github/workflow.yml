@@ -1,0 +1,28 @@
+name: Self Hosted CI - Ex6
+
+defaults:
+  run:
+    shell: bash
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  k8s-deploy:
+    name: Deployment on K8s
+    runs-on: self-hosted
+    needs: deploy
+
+    if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: show date
+        run: |
+          date
+
+      - name: Executer K8s manifest file
+        run: |
+         kubectl apply -f .              # location of k8s folder
