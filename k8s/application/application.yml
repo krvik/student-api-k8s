@@ -32,7 +32,7 @@ spec:
        initContainers:
          - name: db-migrations
            image: vikashkumardev1996/rest_api_webserver:latest
-           command: ["sh", "-c", "npm run migrate"]
+           command: ["sh", "-c", "alembic upgrade head"]                 # npm run migrate
            envFrom:
              - configMapRef:
                 name: student-api-config
