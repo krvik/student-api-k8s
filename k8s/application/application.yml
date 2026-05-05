@@ -1,63 +1,54 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: student-api-config
-  namespace: student-api
+# ============================
+# NODE LABELS (for documentation only)
+# Run these manually:
+# kubectl label nodes minikube app-role=app
+# kubectl label nodes minikube-m02 app-role=db
+# kubectl label nodes minikube-m03 app-role=others
+# ============================
 
-data:
-  DB_HOST: postgres
-  DB_PORT: "5432"
-  DB_NAME: studentdb
 
----
-
+# =====================================================
+# API DEPLOYMENT (runs on app node)
+# =====================================================
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: student-api
+  name: api-deployment
   namespace: student-api
-
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
-      app: student-api
-
+      app: api
   template:
-      metadata:
-        labels:
-          app: student-api
+    metadata:
+      labels:
+        app: api
+    spec:
+      nodeSelector:
+        app-role: app
+      containers:
+      - name: api-container
+        image: vikashkumardev1996/rest_api_webserver:v2
+        ports:
+        - containerPort: 5000
 
-      spec:
-       initContainers:
-         - name: db-migrations
-           image: vikashkumardev1996/rest_api_webserver:latest
-           command: ["sh", "-c", "alembic upgrade head"]                 # npm run migrate
-           envFrom:
-             - configMapRef:
-                name: student-api-config
-       containers:
-        - name: app
-          image: vikashkumardev1996/rest_api_webserver:latest
-          envFrom:
-            - configMapRef:
-               name: student-api-config
-          ports:
-            - containerPort: 8080 
+
 ---
- # service
- 
+# =====================================================
+# API SERVICE
+# =====================================================
 apiVersion: v1
 kind: Service
 metadata:
-  name: student-api-service
+  name: api-service
   namespace: student-api
 spec:
-  type: ClusterIP
   selector:
-    app: student-api
-
+    app: api
   ports:
     - port: 80
-      targetPort: 8080
+      targetPort: 5000
+  type: ClusterIP
+
 

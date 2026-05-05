@@ -1,0 +1,51 @@
+# =====================================================
+# NGINX DEPLOYMENT (runs on others node)
+# =====================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  namespace: student-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      nodeSelector:
+        app-role: others
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+        volumeMounts:
+          - name: nginx-config
+            mountPath: /etc/nginx/conf.d/default.conf
+            subPath: default.conf
+
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: nginx-config
+
+---
+# =====================================================
+# NGINX SERVICE (external access)
+# =====================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+  namespace: student-api
+spec:
+  selector:
+    app: nginx
+  ports:
+    - port: 80
+      nodePort: 30080
+  type: LoadBalancer
