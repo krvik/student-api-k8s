@@ -1,4 +1,4 @@
-name: Self Hosted CI - Ex6
+name: Self Hosted CI - Ex6.1
 
 defaults:
   run:
@@ -18,11 +18,22 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      
+      - name: Debug – show current directory
+        run: pwd
 
+      - name: Debug – list files
+        run: ls -la
+
+      - name: Debug – list k8s folder
+        run: ls -R k8s || echo "k8s folder not found"
+
+
+      
       - name: show date
         run: |
           date
 
       - name: Executer K8s manifest file
         run: |
-         kubectl apply -f .              # location of k8s folder
+          kubectl apply -f k8s/             # location of k8s folder
