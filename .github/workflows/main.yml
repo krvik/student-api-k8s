@@ -1,4 +1,4 @@
-name: Self Hosted CI - Ex7.2
+name: Self Hosted CI - Ex7.3
 
 defaults:
   run:
@@ -72,7 +72,7 @@ jobs:
 
       - name: Get minikube IP
         run: |
-          echo "MINIKUBE_IP=$(minikube ip)" >> $GITHUB_ENV
+          echo "MINIKUBE_IP=$(minikube ip)" 
       
       - name: Curl API
         run: |
