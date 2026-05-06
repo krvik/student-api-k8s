@@ -1,4 +1,4 @@
-name: Self Hosted CI - Ex6.1
+name: Self Hosted CI - Ex7.1
 
 defaults:
   run:
@@ -9,7 +9,7 @@ on:
 
 jobs:
 
-  k8s-deploy:
+  PRQ:
     name: Deployment on K8s
     runs-on: self-hosted
 
@@ -29,11 +29,30 @@ jobs:
         run: ls -R k8s || echo "k8s folder not found"
 
 
-      
-      - name: show date
-        run: |
-          date
+  Crt-NSP:
+    name: K8s namespace creation
+    runs-on: self-hosted
+    needs: PRQ
 
-      - name: Executer K8s manifest file
+    if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create Namespace
         run: |
-          kubectl apply -f k8s/apply.sh          # location of k8s folder
+          kubectl apply -f k8s/namespace/
+    
+  Crt-Deployment:
+    name: Executing kubernetes manifests
+    runs-on: self-hosted
+    needs: Crt-NSP
+
+    if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create other reseources and deployments
+        run: |
+          kubectl apply -f k8s/application/
