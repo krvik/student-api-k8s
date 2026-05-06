@@ -9,8 +9,8 @@ on:
 
 jobs:
 
-  PRQ:
-    name: Deployment on K8s
+  Pre-requisite k8s:
+    name: Pre-requiste for k8s
     runs-on: self-hosted
 
 
@@ -29,10 +29,10 @@ jobs:
         run: ls -R k8s || echo "k8s folder not found"
 
 
-  Crt-NSP:
-    name: K8s namespace creation
+  Create-namespace:
+    name: k8s namespace creation
     runs-on: self-hosted
-    needs: PRQ
+    needs: Pre-requisite k8s
 
     if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
 
@@ -43,10 +43,10 @@ jobs:
         run: |
           kubectl apply -f k8s/namespace/
     
-  Crt-Deployment:
-    name: Executing kubernetes manifests
+  Create-k8s-Deployment:
+    name: Executing k8s manifests
     runs-on: self-hosted
-    needs: Crt-NSP
+    needs: Create-namespace
 
     if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
 
@@ -56,3 +56,26 @@ jobs:
       - name: Create other reseources and deployments
         run: |
           kubectl apply -f k8s/application/
+          kubectl apply -f k8s/database/
+          kubectl apply -f k8s/nginx/
+
+
+  Check-the-API:
+    name: Executing k8s manifests
+    runs-on: self-hosted
+    needs: Create-k8s-Deployment
+
+    if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get minikube IP
+        run: |
+          IP = $(minikube ip)
+      
+      - name: Do health check
+        run: |
+          curl http://$IP:30080/health
+          
+          
