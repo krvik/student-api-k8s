@@ -1,4 +1,4 @@
-name: Self Hosted CI - Ex7.1
+name: Self Hosted CI - Ex7.2
 
 defaults:
   run:
@@ -9,7 +9,7 @@ on:
 
 jobs:
 
-  Pre-requisite k8s:
+  Pre-requisite-k8s:
     name: Pre-requiste for k8s
     runs-on: self-hosted
 
@@ -32,7 +32,7 @@ jobs:
   Create-namespace:
     name: k8s namespace creation
     runs-on: self-hosted
-    needs: Pre-requisite k8s
+    needs: Pre-requisite-k8s
 
     if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
 
