@@ -61,7 +61,7 @@ jobs:
 
 
   Check-the-API:
-    name: Executing k8s manifests
+    name: Check- API Health
     runs-on: self-hosted
     needs: Create-k8s-Deployment
 
@@ -72,10 +72,10 @@ jobs:
 
       - name: Get minikube IP
         run: |
-          IP = $(minikube ip)
+          echo "MINIKUBE_IP=$(minikube ip)" >> $GITHUB_ENV
       
-      - name: Do health check
+      - name: Curl API
         run: |
-          curl http://$IP:30080/health
+          curl http://$MINIKUBE:30080/health
           
           
